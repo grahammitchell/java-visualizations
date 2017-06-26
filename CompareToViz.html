@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>compareTo() Visualizer</title>
+	<style type='text/css'>
+		.snippet td, .snippet input {
+			font: 24pt Consolas, Courier New, monospace;
+			text-align: left;
+		}
+		.center td {
+			text-align: center;
+		}
+		.snippet li {
+			font: 18pt Consolas, Courier New, monospace;
+		}
+		body {
+			margin-left: 40px;
+		}
+	</style>
+</head>
+<body>
+	<p>Change the words and see what happens!</p>
+	<table>
+		<tr class=snippet>
+			<td>String a = "
+			<td><input size="13" id='a' value='axe'>
+			<td>";
+		</tr>
+		<tr class=center>
+			<td>
+			<td><button onclick="swap();">&darr; SWAP &uarr;</button>
+			<td>
+		</tr>
+	</table>
+	<table>
+		<tr class=snippet>
+			<td>String b = "
+			<td><input size="13" id='b' value='carrot'>
+			<td>";
+		</tr>
+		<tr><td>&nbsp;
+	</table>
+	<table>
+		<tr class=snippet>
+			<td>a.compareTo(b)
+			<td>&nbsp;==&nbsp;&nbsp;
+			<td><input size="3" id='out' value='-2'>
+		</tr>
+		<tr class=snippet>
+			<td>a.compareToIgnoreCase(b)
+			<td>&nbsp;==&nbsp;&nbsp;
+			<td><input size="3" id='out2' value='-2'>
+		</tr>
+	</table>
+	<pre>
+	
+	
+	</pre>
+	
+	<ol class=snippet>
+		<li><a href="#" onclick="set('apple','coffee'); return false;">"apple".compareTo("coffee")</a>
+		<li><a href="#" onclick="set('coffee','apple'); return false;">"coffee".compareTo("apple")</a>
+		<li><a href="#" onclick="set('abrogate','abscess'); return false;">"abrogate".compareTo("abscess")</a>
+		<li><a href="#" onclick="set('biblio','bible-thumper'); return false;">"biblio".compareTo("bible-thumper")</a>
+		<li><a href="#" onclick="set('aaBaa','aaEaa'); return false;">"aaBaa".compareTo("aaEaa")</a>
+		<li><a href="#" onclick="set('vvBvv','vvEvv'); return false;">"vvBvv".compareTo("vvEvv")</a>
+		<li><a href="#" onclick="set('anti','ant'); return false;">"anti".compareTo("ant")</a>
+		<li><a href="#" onclick="set('qqqqq','qqq'); return false;">"qqqqq".compareTo("qqq")</a>
+		<li><a href="#" onclick="set('zabq','zabq!'); return false;">"zabq".compareTo("zabq!")</a>
+		<li><a href="#" onclick="set('AP','APostrophe'); return false;">"AP".compareTo("APostrophe")</a>
+		<li><a href="#" onclick="set('A','a'); return false;">"A".compareTo("a")</a>
+		<li><a href="#" onclick="set('lazer','LaZeR'); return false;">"lazer".compareTo("LaZeR")</a>
+		<li><a href="#" onclick="set('cat','cat'); return false;">"cat".compareTo("cat")</a>
+		<li><a href="#" onclick="set('&%$^','&%$^'); return false;">"&%$^".compareTo("&%$^")</a>
+	</ol>
+	<script type='text/javascript'>
+		"use strict";
+		var a, b, out, out2;
+
+		function update() {
+			a = document.getElementById('a').value;
+			if ( ! a )
+				a = "";
+			b = document.getElementById('b').value;
+			if ( ! b )
+				b = "";
+			out = ""+compareTo(a,b);
+			out2 = ""+compareToIgnoreCase(a,b);
+			document.getElementById('out').value = out;
+			document.getElementById('out2').value = out2;
+		}
+		
+		function set( a, b ) {
+			document.getElementById('a').value = a;
+			document.getElementById('b').value = b;
+		}
+		
+		function swap() {
+			var temp = document.getElementById('a').value;
+			document.getElementById('a').value = document.getElementById('b').value;
+			document.getElementById('b').value = temp;
+		}
+		
+		function ord( c ) { return c.charCodeAt(0); }
+
+		function compareTo( a, b ) {
+			for ( var i=0; i<a.length && i<b.length; i++ ) {
+				if ( a.charAt(i) != b.charAt(i) ) {
+					return (ord(a.charAt(i)) - ord(b.charAt(i)));
+				}
+			}
+			return a.length - b.length;
+		}
+		
+		function compareToIgnoreCase( a, b ) {
+			return compareTo( a.toLowerCase(), b.toLowerCase() );
+		}
+
+		function main() {
+			setInterval(update, 1000/60);
+		}
+
+		main();
+	</script>
+</body>
+</html>

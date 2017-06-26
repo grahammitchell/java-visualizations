@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Boring Triangle Demo</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id='canvas' width='400' height='300'></canvas>
+	<script type='text/javascript'>
+		var ctx; 
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+			ctx.fillStyle = "#A55ADE";
+			ctx.beginPath();
+			ctx.moveTo(200, 50);
+			ctx.lineTo(150, 200);
+			ctx.lineTo(250, 180);
+			ctx.fill();
+		}
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			draw(ctx);
+		}
+
+		main();
+	</script>
+</body>
+</html>

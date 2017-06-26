@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Random Ranges Visualizer</title>
+	<style type='text/css'>
+		canvas { border: 1px solid black; }
+	</style>
+</head>
+<body>
+	<p>Change the numbers and see what happens!</p>
+	<canvas id='canvas' width='800' height='500'></canvas>
+	<script type='text/javascript'>
+		var ctx; 
+		var mouse = { x: 0, y: 0 };
+		var values = [ "ERR", "50", "300" ];
+		var samples = [ 0, 0, 0, 0, 0, 0, 0 ];
+		var need_samples = true;
+		var activeBox = 0;
+		var lo = 50, range = 300, hi = range+lo-1;
+		var codeFont = "24pt Consolas, Courier New, monospace";
+		var regularFont = "20pt Calibri, Arial, sans-serif";
+
+		var box1 = { x:  45, y:  50, w: 100, h:  38 };
+		var box2 = { x: 552, y:  50, w: 120, h:  38 };
+
+		function update() {
+			lo = s2i( values[1] );
+			range = s2i( values[2] );
+			hi = range + lo - 1;
+			if ( need_samples ) {
+				for ( var i = 0; i < samples.length; i++ )
+					samples[i] = lo + Math.floor( Math.random() * range );
+				need_samples = false;
+			}
+		}
+
+		function centerTextX( s, box ) {
+			// returns the x offset that horizontally centers the String within the given rectangle
+			var width = ctx.measureText(s).width;
+			return box.x + (box.w - width)/2;
+		}
+
+		function s2i( s ) {
+			var n = 0;
+			if ( s.length > 0 ) {
+				var test = parseInt(s, 10);
+				if ( ! isNaN(test) )
+					n = test;
+			}
+			return n;
+		}
+
+
+		function contains( click, box ) {
+			if ( click.x > box.x + box.w )
+				return false;
+			if ( click.y > box.y + box.h )
+				return false;
+			if ( box.x > click.x )
+				return false;
+			if ( box.y > click.y )
+				return false;
+
+			return true;
+		}
+
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			
+			// draw text boxes
+			ctx.fillStyle = "#AAAAAA";
+			ctx.fillRect(box1.x, box1.y, box1.w, box1.h);
+			ctx.fillRect(box2.x, box2.y, box2.w, box2.h);
+
+			// draw code snippet
+			ctx.fillStyle = "black";
+			ctx.font = codeFont;
+			ctx.textBaseline = "top";
+			ctx.fillText(" + (int)(Math.random()*       )", 134, 50);
+
+			var b1 = values[1];
+			var b2 = values[2];
+
+			// outline active box and append 'cursor'
+			if ( activeBox === 1 ) {
+				ctx.strokeRect(box1.x, box1.y, box1.w, box1.h);
+				if ( b1.length === 0 )
+					b1 = "|";
+			}
+			else if ( activeBox === 2 ) {
+				ctx.strokeRect(box2.x, box2.y, box2.w, box2.h);
+				if ( b2.length === 0 )
+					b2 = "|";
+			}
+
+			// draw current values into text boxes
+			var x1 = centerTextX(b1, box1);
+			ctx.fillText( b1, x1, box1.y);
+			var x2 = centerTextX(b2, box2);
+			ctx.fillText( b2, x2, box2.y);
+
+			// draw details about random numbers
+			ctx.font = regularFont;
+			ctx.fillText("Gives one value randomly chosen from " + lo + " to " + hi + ".", 100, 200 );
+			ctx.fillText("There are " + Math.abs(range) + " possible values.", 100, 235 );
+			ctx.fillText("The smallest possible value is " + lo + ".", 100, 270 );
+			ctx.fillText("The largest possible value is " + hi + ".", 100, 305 );
+			ctx.fillText("Some samples: ", 100, 370 );
+			for ( var i = 0; i < samples.length; i++ )
+				ctx.fillText(samples[i], 70+(100*i), 415);
+
+			// draw debugging stuff
+			ctx.fillStyle = "black";
+
+		}
+
+		function preventDefault(e)
+		{
+			var evt = e ? e : window.event;
+			if ( evt.preventDefault )
+				evt.preventDefault();
+			else
+				evt.returnValue = false;
+
+			return false;
+		}
+
+		var KEY_UP = 38, KEY_DOWN = 40, KEY_LEFT = 37, KEY_RIGHT = 39;
+		var KEY_ENTER = 13, KEY_ESC = 27, KEY_BACKSPACE = 8, KEY_TAB = 9;
+		var KEY_MINUS = 189, KEYPAD_MINUS = 109;
+
+		function handleKeyDown(e) {
+			var evt = e ? e : window.event;
+			var ch = evt.keyCode;
+			if ( ch === KEY_BACKSPACE ) {
+				if ( values[activeBox].length > 0 )
+					values[activeBox] = values[activeBox].substring(0, values[activeBox].length-1);
+				need_samples = true;
+				return preventDefault(evt);
+			}
+			else if ( ch === KEY_MINUS || ch === KEYPAD_MINUS ) {
+				values[activeBox] += "-";
+				need_samples = true;
+				return preventDefault(evt);
+			}
+			else if ( ch === KEY_ENTER ) {
+				if ( values[activeBox].length === 0 )
+					values[activeBox] = "0";
+				activeBox = 0;
+				need_samples = true;
+				return preventDefault(evt);
+			}
+			else if ( ch === KEY_TAB ) {
+				if ( values[activeBox].length === 0 )
+					values[activeBox] = "0";
+				activeBox = (activeBox+1)%3;
+				need_samples = true;
+				return preventDefault(evt);
+			}
+			else if ( 48 <= ch && ch <= 57 ) {
+				values[activeBox] += String.fromCharCode(ch);
+				need_samples = true;
+				return preventDefault(evt);
+			}
+			else if ( 96 <= ch && ch <= 105 ) {
+				values[activeBox] += String.fromCharCode(ch - 48);
+				need_samples = true;
+				return preventDefault(evt);
+			}
+		}
+
+
+		function mouseClicked(e) {
+			var evt = e || window.event;
+			mouse.x = evt.pageX - ctx.canvas.offsetLeft;
+			mouse.y = evt.pageY - ctx.canvas.offsetTop;
+			if ( contains(mouse, box1) ) {
+				activeBox = 1;
+				values[1] = "";
+				need_samples = true;
+			}
+			else if ( contains(mouse, box2) ) {
+				activeBox = 2;
+				values[2] = "";
+				need_samples = true;
+			}
+			else {
+				if ( values[activeBox].length === 0 )
+					values[activeBox] = "0";
+				activeBox = 0;
+				need_samples = true;
+			}
+
+		}
+
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			document.addEventListener('keydown', handleKeyDown);
+			document.addEventListener('click', mouseClicked);
+			setInterval(function() { update(); draw(ctx); }, 1000/60);
+		}
+
+		main();
+	</script>
+	<p><a href="./">TOC</a></p>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Class Maker</title>
+	<style type='text/css'>
+		pre.snippet {
+			font: 20pt Consolas, Courier New, monospace;
+			margin-left: 20px;
+		}
+	</style>
+</head>
+<body>
+<pre class=snippet>
+<span id=instantiation>Foo f = new Foo( 12, 3.4 );</span>
+<span id=methodcalls>int x = f.getFirst();</span>
+</pre>
+<hr>
+
+<p><button id=togglebutton type='button' onclick="toggle('solution'); return false;">Hide Solution</button>
+<button type='button' onclick="redo(); return false;">Redo</button>
+</p>
+
+<pre class=snippet id=solution>
+public class <span id=classname1>Foo</span> {
+<span id=fields>    private int first;
+    private double second;
+</span>
+<span id=constructor>    public Foo( int first, double second ) {
+        this.first = first;
+        this.second = second;
+    }</span>
+
+<span id=getter>    public int getFirst() {
+        return first;
+    }
+
+    public double getSecond() {
+        return second;
+    }</span>
+}
+</pre>
+	<script type='text/javascript'>
+		"use strict";
+		var computed = false;
+		var hideInitially = false;
+		var nouns = [
+			"foo", "bar", "baz", "qux", "quux", "quuz", "corge", "grault",
+			"garply", "waldo", "fred", "plugh", "xyzzy", "thud", "qwerty",
+
+			"alfa", "bravo", "charlie", "delta", "echo", "foxtrot", "golf",
+			"hotel", "india", "juliett", "kilo", "lima", "mike", "november",
+			"oscar", "papa", "quebec", "romeo", "sierra", "tango", "uniform",
+			"victor", "whiskey", "xray", "yankee", "zulu",
+
+			"cat", "dog", "bunny", "rabbit", "pig", "horse", "goat", "sheep",
+			"cow", "chicken", "turkey", "squirrel", "snake", "bear", "tiger",
+			"lion", "wolf", "deer", "duck", "swan", "reindeer", "mouse",
+
+			"ford", "chevy", "toyota", "honda", "cadillac", "lexus", "kia",
+			"jeep", "acura", "audi", "bentley", "bmw", "chrysler", "dodge",
+			"gmc", "hyundai", "infiniti", "jaguar", "lincoln", "mazda",
+			"mercedes", "mitsubishi", "nissan", "scion", "subaru", "tesla",
+			"volkswagen", "volvo",
+
+			"book", "pencil", "paper", "stapler", "holepunch", "notebook",
+			"folder", "locker", "sharpener", "pen", "eraser", "compass",
+
+			"rectangle", "square", "line", "triangle", "circle", "oval",
+			"rhombus", "pentagon", "hexagon", "octagon", "cube", "sphere",
+			"pyramid", "cylinder", "parabola", "hyperbola",
+
+			"simile", "metaphor", "hyperbole", "alliteration", "personification",
+			"onomatopoeia", "idiom", "allegory", "cliche", "syndcdoche",
+
+			// "", "", "", "", "", "", "", "", "",
+		];
+
+		var fields = {
+			"int": [
+				"legs", "teeth", "sides", "angles", "hats", "gallons",
+				"powerlevel", "wings", "doors", "horns", "lazers", "quantity",
+				"levers", "positions", "months", "years", "kills", "gears",
+				"quarts", "ounces", "pounds", "kilograms", "meters", "inches",
+				"seats", "weapons", "tires", "pages", "points", "ports",
+			],
+			"double": [
+				"gallons", "powerlevel", "positions", "months", "years",
+				"quarts", "ounces", "pounds", "kilograms", "meters", "inches",
+				"health", "shield", "fuel", "rating", "percentage", "money",
+				"dollars", "euro", "bitcoin", "taxrate", "margin", "price",
+				"weight",
+			],
+			"String": [
+				"name", "manufacturer", "firstname", "lastname", "middlename",
+				"brand", "nickname", "state", "country", "licenseplate", "slogan",
+				"superpower", "allegiance", "team", "city", "creator", "enemy",
+				"nemesis", "weakness", "model", "condition", "location", "upc",
+				"color", "material", "date", "time",
+			],
+			"boolean": [
+				"hairy", "broken", "working", "functional", "used", "new",
+				"sleepy", "burning", "weekend", "smiling", "awake", "employed",
+				"sober", "vacation", "tired", "clean", "messy", "colinear",
+				"correct", "lying", "president", "retired", "rich", "citizen",
+			],
+		};
+
+
+		var types = [
+			"boolean", "String", "String", "int", "int", "int", "double", "double", "double",
+		];
+
+		var idGroups = [
+			[ "a", "b", "c" ],
+			[ "x", "y", "z" ],
+			[ "one", "two", "three" ],
+			[ "first", "second", "third" ],
+			[ "uno", "dos", "tres" ],
+			[ "eins", "zwei", "trei" ],
+			[ "un", "deux", "trois" ],
+			[ "unus", "duo", "tres" ],
+			[ "apple", "banana", "fig" ],
+		];
+
+		var verbs = [
+			"process", "fabricate", "frobnicate", "frob", "wheedle", "cajole",
+			"fight", "throw", "zip", "stitch", "flatter", "beguile", "influence",
+			"inveigle", "formulate", "mix", "compose", "concoct", "prevaricate",
+			"tweak", "adjust", "modify", "regulate", "rework", "chomp",
+			"transmogrify", "transmute",
+		];
+
+		var paramChances = [ 1, 1, 1, 2, 2, 2, 2, 2, 3, 3 ];
+
+		function update() {
+			if ( computed )
+				return;
+
+			computed = true;
+
+			var classname = choose(nouns);
+			classname = capitalize(classname);
+			document.getElementById('classname1').textContent = classname;
+			var objname = lowerFirst(classname);
+			objname = objname + objname;
+
+			var numParams = choose(paramChances);
+			var idList = choose(idGroups);
+			var useInitials = Math.random() < 0.2;
+
+			// choose fields / parameters
+			var paramList = [];
+			for ( var i=0; i<numParams; i++ ) {
+				var item = {};
+				item.type = choose(types);
+				item.id = useInitials ? lowerFirst(item.type) : idList[i];
+
+				if ( item.type === "boolean" ) {
+					item.value = ( Math.random() < 0.5 ) ? "true" : "false";
+				}
+				else if ( item.type === "int" ) {
+					item.value = irandom(0, 20);
+				}
+				else if ( item.type === "double" ) {
+					item.value = frandom(0, 20);
+				}
+				else if ( item.type === "String" ) {
+					item.value = '"' + choose(nouns) + '"';
+				}
+				paramList.push(item);
+			}
+			// console.log(JSON.stringify(paramList));
+
+			var constructorParamList = extractFieldToArr('value', paramList).join(", ");
+			var instantiation = classname + " " + objname + " = new " + classname + "( " + constructorParamList + " );";
+			document.getElementById('instantiation').textContent = instantiation;
+
+			// fields
+			var fieldDecl = "";
+			for ( var i=0; i<numParams; i++ ) {
+				fieldDecl += "    private " + paramList[i].type + " " + paramList[i].id + ";\n";
+			}
+			document.getElementById('fields').textContent = fieldDecl;
+
+			// constructor implementation
+			var constructorImpl = "    public " + classname + "( ";
+			for ( var i=0; i<numParams-1; i++ ) {
+				constructorImpl += paramList[i].type + " " + paramList[i].id + ", ";
+			}
+			constructorImpl += paramList[numParams-1].type + " " + paramList[numParams-1].id + ") {\n";
+			for ( var i=0; i<numParams; i++ ) {
+				constructorImpl += "        this." + paramList[i].id + " = " + paramList[i].id + ";\n";
+			}
+			constructorImpl += "    }";
+			document.getElementById('constructor').textContent = constructorImpl;
+
+			// single getter
+			var thingy = choose(paramList);
+			var methodcall = thingy.type + " x = " + objname + ".get" + capitalize(thingy.id) + "();"
+			document.getElementById('methodcalls').textContent = methodcall;
+
+			var methodImpl = "    public " + thingy.type + " get" + capitalize(thingy.id) + "() {\n";
+			methodImpl += "        return " + thingy.id + ";\n    }";
+			document.getElementById('getter').textContent = methodImpl;
+		}
+
+		function s2i( s ) {
+			var n = 0;
+			if ( s.length > 0 ) {
+				var test = parseInt(s, 10);
+				if ( ! isNaN(test) )
+					n = test;
+			}
+			return n;
+		}
+
+		function choose( arr ) {
+			return arr[Math.floor(Math.random()*arr.length)];
+		}
+
+		function capitalize( str ) {
+			return str.charAt(0).toUpperCase() + str.substring(1);
+		}
+
+		function lowerFirst( str ) {
+			return str.charAt(0).toLowerCase();
+		}
+
+		function irandom( min, max ) {
+			return Math.floor(Math.random()*(max-min+1)) + min;
+		}
+
+		function frandom( min, max ) {
+			min = 10*min;
+			max = 10*max;
+			var val = Math.floor(Math.random()*(max-min+1)) + min;
+			return val / 10.0;
+		}
+
+		function extractFieldToArr( field, arr ) {
+			var arr2 = [];
+			for ( var i=0; i<arr.length; i++ ) {
+				arr2.push( arr[i][field] );
+			}
+			return arr2;
+		}
+
+		function redo() {
+			computed = false;
+		}
+
+		function toggle( id ) {
+			var elm = document.getElementById(id);
+			var button = document.getElementById('togglebutton');
+			if ( elm.style.display == 'none' ) {
+				elm.style.display = 'block';
+				button.textContent = 'Hide Solution';
+			}
+			else {
+				elm.style.display = 'none';
+				button.textContent = 'Show Solution';
+			}
+		}
+
+		function main() {
+			if ( hideInitially == true ) {
+				toggle('solution');
+			}
+			setInterval(function() { update(); }, 1000/60);
+		}
+
+		main();
+	</script>
+</body>
+</html>

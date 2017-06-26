@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Forest and Trees Demo</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id='canvas' width='1024' height='768'></canvas>
+	<script type='text/javascript'>
+		var ctx;
+		var x, y, x1, y1, x2, y2, x3, y3, n;
+
+		function drawTree( ctx, x, y ) {
+			ctx.fillStyle = "rgb(134,83,0)";
+			ctx.fillRect(x+17,y+50,16,50);
+			ctx.strokeRect(x+16.5,y+49.5,16,50);
+			ctx.beginPath();
+			ctx.moveTo(x+25,y);
+			ctx.lineTo(x,y+75);
+			ctx.lineTo(x+50,y+75);
+			ctx.lineTo(x+25,y);
+			ctx.fillStyle = "rgb(0,255,0)";
+			ctx.fill();
+			ctx.stroke();
+		}
+
+		function drawForest( ctx, x, y, w, h ) {
+			ctx.strokeRect(x,y,w,h);
+			for ( var n=0; n<100; n++ ) {
+				var a = Math.floor( Math.random()*(w-50) );
+				var b = Math.floor( Math.random()*(h-100) );
+				drawTree(ctx, x+a, y+b);
+			}
+		}
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+			// draws a few single trees for testing
+			drawTree(ctx, 30,550);
+			drawTree(ctx,100,580);
+			drawTree(ctx,640,300);
+			drawTree(ctx,730,370);
+
+			// draws the first forest
+			ctx.strokeRect(10,10,500,500);
+			drawForest(ctx,10,10,500,500);
+
+			// draws the second forest
+			ctx.strokeRect(550,20,400,250);
+			drawForest(ctx,550,20,400,250);
+
+			// draws the third forest
+			ctx.strokeRect(200,530,710,160);
+			drawForest(ctx,200,530,710,160);
+		}
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			draw(ctx);
+		}
+
+		main();
+	</script>
+</body>
+</html>

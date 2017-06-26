@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Sierpinski Demo</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id='canvas' width='1005' height='735'></canvas>
+	<script type='text/javascript'>
+		var ctx;
+		var looper;
+		var x, y, x1, y1, x2, y2, x3, y3, n;
+
+		function init() {
+			x = 512;
+			y = 382;
+			x1 = 512;
+			y1 = 109;
+			x2 = 146;
+			y2 = 654;
+			x3 = 876;
+			y3 = 654;
+			n = 0;
+			looper = null;
+		}
+
+		function update() {
+			var dx, dy, r;
+			r = 1 + Math.floor( Math.random()*3 );
+			if ( r === 1 ) {
+				dx = x - x1;
+				dy = y - y1;
+			}
+			else if ( r === 2 ) {
+				dx = x - x2;
+				dy = y - y2;
+			}
+			else {
+				dx = x - x3;
+				dy = y - y3;
+			}
+			x = x - dx/2;
+			y = y - dy/2;
+		}
+
+		function draw(ctx) {
+			if ( n < 50000 )
+			{
+				for ( var i=0; i<35; i++ ) {
+					ctx.fillRect(x,y,1,1);
+					update();
+				}
+				n+=35;
+			}
+			else {
+
+				ctx.fillText("Sierpinski Triangle!", 468, 484);
+				clearInterval(looper);
+			}
+		}
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			init();
+			looper = setInterval(function() { draw(ctx); }, 2);
+		}
+
+		main();
+	</script>
+</body>
+</html>

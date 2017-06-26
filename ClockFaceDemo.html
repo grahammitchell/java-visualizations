@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Clock Face Demo</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id='canvas' width='400' height='300'></canvas>
+	<script type='text/javascript'>
+		var ctx; 
+
+		function drawLine( ctx, x1, y1, x2, y2 ) {
+			ctx.beginPath();
+			ctx.moveTo(x1-0.5, y1-0.5);
+			ctx.lineTo(x2-0.5, y2-0.5);
+			ctx.closePath();
+			ctx.stroke();
+		}
+
+		function drawGrid( ctx ) {
+			var X, Y;
+			ctx.save();
+			ctx.fillStyle = "black";
+			ctx.font = "10px sans-serif";
+			// labels
+			for ( X=50; X<ctx.canvas.width; X+=50 )
+				ctx.fillText( ""+X, X-7, 48 );
+			for ( Y=100; Y<ctx.canvas.height; Y+=50 )
+				ctx.fillText( ""+Y, 15, Y+3 );
+			// lines
+			ctx.strokeStyle = "#cccccc";
+			for ( X=0; X<ctx.canvas.width; X+=50 )
+				drawLine(ctx, X, 0, X, ctx.canvas.height-1); // horizontal
+			for ( Y=0; Y<ctx.canvas.height; Y+=50 )
+				drawLine(ctx, 0, Y, ctx.canvas.width-1, Y); // vertical
+			ctx.restore();
+		}
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+			// draw outer circle
+			ctx.beginPath();
+			ctx.arc(200, 150, 100, 0, 2*Math.PI, false);
+			ctx.stroke();
+
+			// arms
+			drawLine(ctx, 200, 150, 140, 170);
+			drawLine(ctx, 200, 150, 110, 150);
+
+			// numbers
+			ctx.font = "24px serif";
+			ctx.fillText( "12", 188, 80 );
+			ctx.fillText( "3", 272, 158 );
+			ctx.fillText( "6", 193, 240 );
+			ctx.fillText( "9", 114, 158 );
+
+			// draw hands "cover"
+			ctx.fillStyle = "#bbb";
+			ctx.beginPath();
+			ctx.arc(200, 150, 4, 0, 2*Math.PI, false);
+			ctx.fill();
+
+
+			// drawGrid(ctx);
+		}
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			draw(ctx);
+		}
+
+		main();
+	</script>
+</body>
+</html>

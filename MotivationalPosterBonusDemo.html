@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Motivational Poster Bonus Demo</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id='canvas' width='800' height='580'></canvas>
+	<script type='text/javascript'>
+		var ctx;
+		var face = new Image();
+		var faceReady = false;
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			ctx.fillStyle = "red";
+			ctx.strokeStyle = "red";
+			if ( faceReady )
+				ctx.drawImage(face, 130, 20);
+			ctx.font = '96pt Times New Roman, serif';
+			ctx.fillText("M", 130, 519);
+			ctx.fillText("L", 592, 519);
+			ctx.font = '48pt Times New Roman, serif';
+			ctx.fillText("R. MITCHEL", 243, 477);
+			ctx.beginPath();
+				ctx.moveTo(244.5,484.5);
+				ctx.lineTo(597.5,484.5);
+			ctx.closePath();
+			ctx.stroke();
+			ctx.fillStyle = "white";
+			ctx.font = 'small-caps 24pt Century Gothic, Futura, sans-serif';
+			ctx.fillText("Not a cyborg. Probably.", 255, 555);
+		}
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			face.onload = function() { faceReady = true; draw(ctx); }
+			face.src = 'face-model-cropped.jpg';
+			// draw(ctx);
+		}
+
+		main();
+	</script>
+</body>
+</html>

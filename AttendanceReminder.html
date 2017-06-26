@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Attendance Reminder</title>
+	<style type='text/css'>
+		body {
+			font-family: Verdana, Arial, Helvetica, sans-serif;
+			font-size: 18px;
+			line-height: 1.6;
+			background-color: #ffffee;
+			color: #222;
+			margin: 40px auto;
+			max-width: 750px;
+			padding: 0 10px;
+		}
+		h1, h2, h3 {
+			line-height: 1.2;
+		}
+		.schedule {
+			border: solid thin #000;
+			border-width: 1px;
+			border-collapse: collapse;
+		}
+		.schedule td {
+			padding: 1px 5px 1px 5px;
+			text-align: right;
+			font-size: 24px;
+		}
+		.schedule th {
+			border-left: solid thin #000;
+			text-align: 5px;
+		}
+		.schedule sup {
+			font-size: 12px;
+		}
+		tr.A {
+			background-color: #eeeeee;
+		}
+	</style>
+</head>
+<body>
+
+<audio id="audio">
+	<source src="audio/remember_to_take_attendance1.ogg" type="audio/ogg">
+	<source src="audio/remember_to_take_attendance1.mp3" type="audio/mp3">
+</audio>
+
+<h2 id="datestring">It is Wednesday, November 30, 2020</h2>
+<h3 id="bulb"></h3>
+
+<p>Remind me <select id="offset" onchange="updateOffset()">
+	<option value="1">1
+	<option value="3">3
+	<option value="5">5
+	<option value="7">7
+	<option selected value="10">10
+	<option value="15">15
+</select> minutes into each period.&nbsp;
+	<button type='button' onclick="play(); return false;">Test Audio</button>
+</p>
+
+<hr>
+
+<pre>
+</pre>
+
+<table class=schedule>
+	<tr class=A><td>1<sup>st</sup>, 5<sup>th</sup> |<td> 8:40<td>&ndash;<td>10:03
+	<tr class=B><td>2<sup>nd</sup>, 6<sup>th</sup> |<td>10:09<td>&ndash;<td>11:32
+	<tr class=A><td>Pride                          |<td>11:37<td>&ndash;<td>12:07
+	<tr class=B><td>3<sup>rd</sup>, 7<sup>th</sup> |<td>12:13<td>&ndash;<td> 2:18
+	<tr class=A><td>4<sup>th</sup>, 8<sup>th</sup> |<td> 2:23<td>&ndash;<td> 3:45
+</table>
+<p>A lunch 12:48&ndash;1:23/1:28&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;B lunch 1:43&ndash;2:18</p>
+
+<hr>
+<pre>
+</pre>
+
+<h1>Remember to Take Attendance!</h1>
+<p>Attendance Reminder v 1.0 &mdash; &copy;2017 Graham Mitchell</p>
+
+<ul>
+	<li><a target="_blank" href="https://itccsgb.esc20.net/LN/Login.aspx">txGradebook / iTCCS</a>
+</ul>
+
+	<script type='text/javascript'>
+		"use strict";
+
+		var bells = [
+			{ hh:  8, mm: 40 },
+			{ hh: 10, mm:  9 },
+			{ hh: 11, mm: 37 },
+			{ hh: 12, mm: 13 },
+			{ hh: 14, mm: 23 },
+		];
+
+		var dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+		var dato = new Date();
+		var debug = false;
+		var offset = 10;
+		var storedOffset = 0;
+		var displayedDow = 0;
+
+		function s2i( s ) {
+			var n = 0;
+			if ( s.length > 0 ) {
+				var test = parseInt(s, 10);
+				if ( ! isNaN(test) )
+					n = test;
+			}
+			return n;
+		}
+
+		function getMinutes() {
+			dato = new Date();
+			return (60*dato.getHours() + dato.getMinutes());
+		}
+
+		function tick() {
+			var mins = getMinutes();
+			var dow = dato.getDay();
+			if ( dow < 1 || dow > 5 )
+				return;
+
+			updateOffset();
+			if ( dow != displayedDow ) {
+				updateDisplayDate(dow);
+				initBells();
+			}
+
+			var clearOthers = false;
+			for (var i=bells.length-1; i >= 0; i--) {
+				var bell = bells[i];
+				if ( mins > bell.mins + offset && bell.played != dow ) {
+					play();
+					bell.played = dow;
+					clearOthers = true;
+				}
+				else if ( clearOthers ) {
+					bell.played = dow;
+				}
+			}
+		}
+
+		function clean() {
+			document.getElementById('bulb').textContent = "";
+		}
+
+		function updateOffset() {
+			offset = s2i(document.getElementById('offset').value);
+			if ( offset != storedOffset ) {
+				localStorage["AttendanceReminderOffset"] = ""+offset;
+				storedOffset = offset;
+			}
+		}
+
+		function updateDisplayDate(dow) {
+			document.getElementById('datestring').textContent = dateString();
+			displayedDow = dow;
+		}
+
+		function play() {
+			var audio = document.getElementById('audio')
+			document.getElementById('bulb').textContent = "DING!";
+			audio.play();
+		}
+
+		function log() {
+			var mins = getMinutes();
+			console.log("-=-=-=-=-=-=-=--=-=-=-=-\nbell  |  now");
+			for (var i=0; i<bells.length; i++) {
+				var bell = bells[i];
+				console.log(" " + bell.mins + " <-> " + mins + " :: " + bell.played);
+			}
+			console.log("Offset is " + offset);
+		}
+
+		function dateString() {
+			return "It is " + dato.toLocaleDateString('en-US', dateOptions);
+		}
+
+		function initBells() {
+			var mins = getMinutes();
+			var dow = dato.getDay();
+			for (var i=0; i<bells.length; i++) {
+				var bell = bells[i];
+				bell.mins = 60*bell.hh + bell.mm;
+				if ( mins >= bell.mins + offset ) {
+					bell.played = dow;
+				}
+				else {
+					bell.played = 0;
+				}
+			}
+		}
+
+		function init() {
+			// var startTime = Math.floor(Date.now() / 1000)
+			var dow = dato.getDay();
+			initBells();
+			var temp = localStorage.getItem("AttendanceReminderOffset");
+			if ( temp !== null ) {
+				offset = s2i(temp);
+				storedOffset = offset;
+				document.getElementById('offset').value = temp;
+			}
+			document.getElementById('datestring').textContent = dateString();
+			displayedDow = dow;
+			setInterval(function() { tick(); },5*1000); // every 5 seconds
+			setInterval(function() { clean(); }, 60*1000); // once a minute
+		}
+
+		init();
+	</script>
+
+</body>
+</html>

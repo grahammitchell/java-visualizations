@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Smiling Face Demo</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id='canvas' width='400' height='300'></canvas>
+	<script type='text/javascript'>
+		var ctx; 
+
+		function drawLine( ctx, x1, y1, x2, y2 ) {
+			ctx.beginPath();
+			ctx.moveTo(x1-0.5, y1-0.5);
+			ctx.lineTo(x2-0.5, y2-0.5);
+			ctx.closePath();
+			ctx.stroke();
+		}
+
+		function drawGrid( ctx ) {
+			var X, Y;
+			ctx.save();
+			ctx.fillStyle = "black";
+			ctx.font = "10px sans-serif";
+			// labels
+			for ( X=50; X<ctx.canvas.width; X+=50 )
+				ctx.fillText( ""+X, X-7, 48 );
+			for ( Y=100; Y<ctx.canvas.height; Y+=50 )
+				ctx.fillText( ""+Y, 15, Y+3 );
+			// lines
+			ctx.strokeStyle = "#cccccc";
+			for ( X=0; X<ctx.canvas.width; X+=50 )
+				drawLine(ctx, X, 0, X, ctx.canvas.height-1); // horizontal
+			for ( Y=0; Y<ctx.canvas.height; Y+=50 )
+				drawLine(ctx, 0, Y, ctx.canvas.width-1, Y); // vertical
+			ctx.restore();
+		}
+
+		function circle( ctx, cx, cy, rad ) {
+			ctx.beginPath();
+			ctx.arc(cx, cy, rad, 0, 2*Math.PI, false);
+			ctx.fill();
+		}
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+			// draw head
+			ctx.fillStyle = "yellow";
+			circle(ctx, 200, 150, 100);
+
+			// eyes
+			ctx.fillStyle = "blue";
+			circle(ctx, 160, 125, 20);
+			circle(ctx, 240, 125, 20);
+
+			// mouth
+			ctx.strokeStyle = "red";
+			ctx.beginPath();
+			ctx.arc(200,170,50,Math.PI/5,4*Math.PI/5);
+			ctx.stroke();
+
+			// drawGrid(ctx);
+		}
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			draw(ctx);
+		}
+
+		main();
+	</script>
+</body>
+</html>

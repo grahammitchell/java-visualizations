@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>fillArc() Visualizer</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+			margin-top: 20px;
+			margin-left: 10px;
+		}
+		.snippet td, .snippet input {
+			font: 24pt Consolas, Courier New, monospace;
+			text-align: center;
+		}
+		.labels td, input.color {
+			font: 12pt Calibri, Arial, sans-serif;
+			text-align: center;
+		}
+		td.top {
+			vertical-align: top;
+		}
+		td span.k { color: rgb(0,0,240); }
+		.sliders input[type='range'] {
+			width: 80px;
+			
+		}
+	</style>
+	<script type="text/javascript" src="jscolor/jscolor.js"></script>
+</head>
+<body>
+	<p>Change the numbers or sliders and see what happens! Hold SHIFT to constrain
+	the angle sliders to 15&deg; increments.</p>
+	<table>
+		<tr class=labels>
+			<td>
+			<td>red
+			<td>
+			<td>green
+			<td>
+			<td>blue
+			<td>
+			<td>(or click &darr;)
+		</tr>
+		<tr class=snippet>
+			<td>g.setColor(<span class=k>new</span> Color(
+			<td><input size=3 id='red' value='255'>
+			<td>,
+			<td><input size=3 id='green' value='255'>
+			<td>,
+			<td><input size=3 id='blue' value='0'>
+			<td>));&nbsp;&nbsp;&nbsp;
+			<td class="top">
+			  <input id="colorpicker" tabindex="-1" value="ffff00" class="color {onImmediateChange:'fixRGB(this);'}">
+		</tr>
+	</table>
+	<table>
+		<tr class=snippet>
+			<td>g.fillArc(
+			<td><input size=3 id='x' value='150'>
+			<td>,
+			<td><input size=3 id='y' value='100'>
+			<td>,
+			<td><input size=3 id='width' value='150'>
+			<td>,
+			<td><input size=3 id='height' value='150'>
+			<td>,
+			<td><input size=3 id='start' value='45'>
+			<td>,
+			<td><input size=3 id='arclen' value='270'>
+			<td>);
+		</tr>
+		<tr class=labels>
+			<td>
+			<td>x
+			<td>
+			<td>y
+			<td>
+			<td>width
+			<td>
+			<td>height
+			<td>
+			<td>angle<br>start
+			<td>
+			<td>arc<br>length
+			<td>
+		</tr>
+		<tr class=sliders>
+			<td>
+			<td>
+			<td>
+			<td>
+			<td>
+			<td>
+			<td>
+			<td>
+			<td>
+			<td><input type="range" value="45"  id="angstart"  min="0" max="360" step="1">
+			<td>
+			<td><input type="range" value="270" id="arclength" min="0" max="360" step="1">
+			<td>
+		</tr>
+	</table>
+	<canvas id='canvas' width='800' height='500'></canvas>
+	<script type='text/javascript'>
+		"use strict";
+		var ctx;
+		var x, y, w, h, startAng, arclen;
+		var r, g, b, color;
+		var slidingA = false;
+		var slidingL = false;
+		var shifted = false;
+
+		function update() {
+			if ( slidingA ) {
+				document.getElementById('start').value = document.getElementById('angstart').value;
+			}
+			else {
+				document.getElementById('angstart').value = document.getElementById('start').value;
+			}
+			if ( slidingL ) {
+				document.getElementById('arclen').value = document.getElementById('arclength').value;
+			}
+			else {
+				document.getElementById('arclength').value = document.getElementById('arclen').value;
+			}
+
+			x        = s2i( document.getElementById('x').value );
+			y        = s2i( document.getElementById('y').value );
+			w        = s2i( document.getElementById('width').value );
+			h        = s2i( document.getElementById('height').value );
+			startAng = s2i( document.getElementById('start').value );
+			arclen   = s2i( document.getElementById('arclen').value );
+
+			r  = retrieveColor('red');
+			g  = retrieveColor('green');
+			b  = retrieveColor('blue');
+			color = "rgb(" + r + "," + g + "," + b + ")";
+			document.getElementById('colorpicker').color.fromRGB(r/255, g/255, b/255);
+			// document.getElementById('angstart' ).value = document.getElementById('start').value;
+			
+			if ( shifted ) {
+				document.getElementById('angstart').step = 15;
+				document.getElementById('arclength').step = 15;
+			}
+			else {
+				document.getElementById('angstart').step = 1;
+				document.getElementById('arclength').step = 1;
+			}
+		}
+
+		function retrieveColor( id ) {
+			var val = s2i( document.getElementById(id).value );
+			if ( val < 0 ) {
+				val = 0;
+				document.getElementById(id).value = "0";
+			}
+			else if ( val > 255 ) {
+				val = 255;
+				document.getElementById(id).value = "255";
+			}
+			return val;
+		}
+
+		function fixRGB(color) {
+			document.getElementById('red'  ).value = Math.round(255 * color.rgb[0]);
+			document.getElementById('green').value = Math.round(255 * color.rgb[1]);
+			document.getElementById('blue' ).value = Math.round(255 * color.rgb[2]);
+		}
+
+		function s2i( s ) {
+			var n = 0;
+			if ( s.length > 0 ) {
+				var test = parseInt(s, 10);
+				if ( ! isNaN(test) )
+					n = test;
+			}
+			return n;
+		}
+
+		function fillArc( x, y, w, h, startAng, arclen ) {
+			var cx = x+w/2;
+			var cy = y+h/2;
+			var start, stop;
+
+			if ( arclen >= 360 ) {
+				start = 0;
+				stop = 2 * Math.PI;
+			}
+			else {
+				start = deg2rad(360 - startAng);
+				stop = deg2rad(360 - (startAng + arclen)%360);
+			}
+
+			ctx.save();
+			ctx.translate(cx, cy);
+			ctx.scale(w,h);
+			ctx.beginPath();
+			ctx.arc(0, 0, 0.5, start, stop, true);
+			ctx.lineTo(0, 0);
+			ctx.restore();
+			ctx.fill();
+		}
+
+		function deg2rad( d ) {
+			return (d*Math.PI)/180.0;
+		}
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+			// highlight rectangle the arc is incribed in
+			ctx.strokeStyle = "#DDDDDD";
+			ctx.strokeRect(x-0.5, y-0.5, w+1, h+1);
+
+			// draw arc
+			ctx.fillStyle = color;
+			fillArc(x, y, w, h, startAng, arclen);
+		}
+
+		function draggA() {	slidingA = true;	}
+		function donedraggA() {
+			slidingA = false;
+			document.getElementById('start').value = document.getElementById('angstart').value;
+		}
+		
+		function draggL() {	slidingL = true;	}
+		function donedraggL() {
+			slidingL = false;
+			document.getElementById('arclen').value = document.getElementById('arclength').value;
+		}
+
+		function keyDown( key ) {
+			if ( key.shiftKey || key.keyCode == 16 ) { shifted = true; }
+		}
+
+		function keyUp( key ) {
+			if ( key.keyCode == 16 ) { shifted = false; }
+		}
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			document.getElementById('angstart').addEventListener('input', draggA);
+			document.getElementById('angstart').addEventListener('change', donedraggA);
+			document.getElementById('arclength').addEventListener('input', draggL);
+			document.getElementById('arclength').addEventListener('change', donedraggL);
+			document.addEventListener('keydown', keyDown);
+			document.addEventListener('keyup', keyUp);
+			setInterval(function() { update(); draw(ctx); }, 1000/60);
+		}
+
+		main();
+	</script>
+</body>
+</html>

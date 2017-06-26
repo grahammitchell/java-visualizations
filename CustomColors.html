@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Custom Colors</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+			margin-top: 20px;
+			margin-left: 10px;
+		}
+		.snippet td, .snippet input {
+			font: 24pt Consolas, Courier New, monospace;
+			text-align: center;
+		}
+		.labels td, input.color {
+			font: 12pt Calibri, Arial, sans-serif;
+			text-align: center;
+		}
+		td.top {
+			vertical-align: top;
+		}
+		td span.k { color: rgb(0,0,240); }
+		.sliders input[type='range'] {
+			width: 80px;
+			
+		}
+	</style>
+	<script type="text/javascript" src="jscolor/jscolor.js"></script>
+</head>
+<body>
+	<p>Change the numbers or sliders and see what happens!</p>
+	<table>
+		<tr class=labels>
+			<td>
+			<td>red
+			<td>
+			<td>green
+			<td>
+			<td>blue
+			<td>
+			<td>(or click &darr;)
+		</tr>
+		<tr class=snippet>
+			<td>g.setColor(<span class=k>new</span> Color(
+			<td><input size=3 id='red' value='255'>
+			<td>,
+			<td><input size=3 id='green' value='255'>
+			<td>,
+			<td><input size=3 id='blue' value='0'>
+			<td>));&nbsp;&nbsp;&nbsp;
+			<td class="top">
+			  <input id="colorpicker" tabindex="-1" value="ffff00" class="color {onImmediateChange:'fixRGB(this);'}">
+		</tr>
+		<tr class=sliders>
+			<td>
+			<td><input type="range" value="255"  id="redSlide"  min="0" max="255" step="1">
+			<td>
+			<td><input type="range" value="255"  id="greenSlide"  min="0" max="255" step="1">
+			<td>
+			<td><input type="range" value="255"  id="blueSlide"  min="0" max="255" step="1">
+			<td>
+		</tr>
+	</table>
+	<table>
+		<tr class=snippet>
+			<td>g.fillRect(150, 100, 150, 150);
+		</tr>
+	</table>
+	<canvas id='canvas' width='800' height='500'></canvas>
+	<script type='text/javascript'>
+		"use strict";
+		var ctx;
+		var r, g, b, color;
+		var slidingR = false;
+		var slidingG = false;
+		var slidingB = false;
+
+		function update() {
+			if ( slidingR ) {
+				document.getElementById('red').value = document.getElementById('redSlide').value;
+			}
+			else {
+				document.getElementById('redSlide').value = document.getElementById('red').value;
+			}
+			if ( slidingG ) {
+				document.getElementById('green').value = document.getElementById('greenSlide').value;
+			}
+			else {
+				document.getElementById('greenSlide').value = document.getElementById('green').value;
+			}
+			if ( slidingB ) {
+				document.getElementById('blue').value = document.getElementById('blueSlide').value;
+			}
+			else {
+				document.getElementById('blueSlide').value = document.getElementById('blue').value;
+			}
+
+			r  = retrieveColor('red');
+			g  = retrieveColor('green');
+			b  = retrieveColor('blue');
+			color = "rgb(" + r + "," + g + "," + b + ")";
+			document.getElementById('colorpicker').color.fromRGB(r/255, g/255, b/255);
+		}
+
+		function retrieveColor( id ) {
+			var val = s2i( document.getElementById(id).value );
+			if ( val < 0 ) {
+				val = 0;
+				document.getElementById(id).value = "0";
+			}
+			else if ( val > 255 ) {
+				val = 255;
+				document.getElementById(id).value = "255";
+			}
+			return val;
+		}
+
+		function fixRGB(color) {
+			document.getElementById('red'  ).value = Math.round(255 * color.rgb[0]);
+			document.getElementById('green').value = Math.round(255 * color.rgb[1]);
+			document.getElementById('blue' ).value = Math.round(255 * color.rgb[2]);
+		}
+
+		function s2i( s ) {
+			var n = 0;
+			if ( s.length > 0 ) {
+				var test = parseInt(s, 10);
+				if ( ! isNaN(test) )
+					n = test;
+			}
+			return n;
+		}
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+			// draw arc
+			ctx.fillStyle = color;
+			ctx.fillRect(150,100,150,150);
+		}
+
+		function draggR() {	slidingR = true;	}
+		function donedraggR() {
+			slidingR = false;
+			document.getElementById('red').value = document.getElementById('redSlide').value;
+		}
+
+		function draggG() {	slidingG = true;	}
+		function donedraggG() {
+			slidingG = false;
+			document.getElementById('green').value = document.getElementById('greenSlide').value;
+		}
+
+		function draggB() {	slidingB = true;	}
+		function donedraggB() {
+			slidingB = false;
+			document.getElementById('blue').value = document.getElementById('blueSlide').value;
+		}
+
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			document.getElementById('redSlide').addEventListener('input', draggR);
+			document.getElementById('redSlide').addEventListener('change', donedraggR);
+			document.getElementById('greenSlide').addEventListener('input', draggG);
+			document.getElementById('greenSlide').addEventListener('change', donedraggG);
+			document.getElementById('blueSlide').addEventListener('input', draggB);
+			document.getElementById('blueSlide').addEventListener('change', donedraggB);
+			setInterval(function() { update(); draw(ctx); }, 1000/60);
+		}
+
+		main();
+	</script>
+</body>
+</html>

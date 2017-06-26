@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Motivational Poster Demo</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id='canvas' width='800' height='560'></canvas>
+	<script type='text/javascript'>
+		var ctx;
+		var face = new Image();
+		var faceReady = false;
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			ctx.fillStyle = "black";
+			ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			ctx.fillStyle = "white";
+			if ( faceReady )
+				ctx.drawImage(face, 130, 30);
+			ctx.font = '60pt Times New Roman, serif';
+			ctx.fillText("MR. MITCHELL", 115, 500);
+			ctx.font = '24pt Century Gothic, Futura, sans-serif';
+			ctx.fillText("NOT A CYBORG. PROBABLY.", 190, 540);
+		}
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			face.onload = function() { faceReady = true; draw(ctx); }
+			face.src = 'face-model-cropped.jpg';
+			// draw(ctx);
+		}
+
+		main();
+	</script>
+</body>
+</html>

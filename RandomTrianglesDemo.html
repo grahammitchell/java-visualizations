@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Random Triangles Demo</title>
+	<style type='text/css'>
+		canvas {
+			border: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<canvas id='canvas' width='800' height='600'></canvas>
+	<script type='text/javascript'>
+		var ctx; 
+
+		function draw(ctx) {
+			ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+			var x1, x2, x3, y1, y2, y3, r, g, b;
+
+			for ( var n = 0; n<500; n++ )
+			{
+				x1 = Math.floor( Math.random()*ctx.canvas.width );
+				x2 = Math.floor( Math.random()*ctx.canvas.width );
+				x3 = Math.floor( Math.random()*ctx.canvas.width );
+				y1 = Math.floor( Math.random()*ctx.canvas.height );
+				y2 = Math.floor( Math.random()*ctx.canvas.height );
+				y3 = Math.floor( Math.random()*ctx.canvas.height );
+				r = Math.floor( Math.random()*256 );
+				g = Math.floor( Math.random()*256 );
+				b = Math.floor( Math.random()*256 );
+
+				ctx.fillStyle = "rgb("+r+","+g+","+b+")";
+				ctx.beginPath();
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.lineTo(x3, y3);
+				ctx.fill();
+			}
+		}
+
+		function main() {
+			ctx = document.getElementById('canvas').getContext("2d");
+			draw(ctx);
+		}
+
+		main();
+	</script>
+</body>
+</html>
