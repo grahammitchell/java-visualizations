@@ -2,11 +2,11 @@
 
 Little thingies to help my students visualize / learn various Java concepts.
 
-- [Math.random() Range Visualizer](RandomNumberViz.html)
-- [compareTo() Visualizer](CompareToViz.html)
+- [Math.random() Range Visualizer](https://grahammitchell.com/jsdemos/RandomNumberViz.html)
+- [compareTo() Visualizer](https://grahammitchell.com/jsdemos/CompareToViz.html)
 - [Class Maker](https://grahammitchell.com/jsdemos/ClassMaker.html)
 - [Custom Color Picker](https://grahammitchell.com/jsdemos/CustomColors.html)
-- [Mr. Mitchell's Handy-Dandy fillArc() Visualizer](FillArc.html)
+- [Mr. Mitchell's Handy-Dandy fillArc() Visualizer](https://grahammitchell.com/jsdemos/FillArc.html)
 
 I also have some very old Java "graphics" assignments using AWT and Swing. These
 demo how their final output should look.
